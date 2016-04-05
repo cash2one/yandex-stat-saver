@@ -21,7 +21,7 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 
 browser = None
 db = None
@@ -51,6 +51,13 @@ def autoclick_sparse_click(dom_element):
 
     return True
 
+def autoclick_new_tab(link):
+    try:
+        action = ActionChains(browser)
+        action.context_click(link).send_keys(Keys.ARROW_DOWN).click().perform()
+    except NoSuchElementException as err:
+        return False
+
 def autoclick_login_ya(ya_context):
     global browser, logged_in
   
@@ -76,7 +83,8 @@ def autoclick_login_ya(ya_context):
     profile.set_preference("browser.cache.memory.enable", False);
     profile.set_preference("browser.cache.offline.enable", False);
     profile.set_preference("network.http.use-cache", False);
-     
+    profile.set_preference("browser.cache.memory.enable", False);     
+
     browser = webdriver.Firefox(proxy=proxy, firefox_profile=profile)
     browser.set_window_size(ya_context['resolution_w'], ya_context['resolution_h'])
     browser.get(url_auth)
@@ -376,8 +384,9 @@ def autoclick_ya_download_statistics():
         time.sleep(5)
     
         try:
-            autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
-            # autoclick_sparse_click(browser.find_element_by_xpath('//div/a/span'))
+            autoclick_new_tab(browser.find_element_by_link_text('скачать в виде XLS-файла'))
+            # autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
+            autoclick_sparse_click(browser.find_element_by_xpath('//div/a/span'))
         except NoSuchElementException as err:
             sys.stderr.write("error %d %s\n" % (err.args[0], err.args[1]))
             return ndownloads
@@ -393,9 +402,10 @@ def autoclick_ya_download_statistics():
  
         time.sleep(5)
         
-        try: 
-            autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
-            # autoclick_sparse_click(browser.find_element_by_xpath('//div/a/span'))
+        try:
+            autoclick_new_tab(browser.find_element_by_link_text('скачать в виде XLS-файла')) 
+            # autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
+            autoclick_sparse_click(browser.find_element_by_xpath('//div/a/span'))
         except NoSuchElementException as err:
             sys.stderr.write("error %d %s\n" % (err.args[0], err.args[1]))
             return ndownloads
@@ -449,7 +459,8 @@ def autoclick_ya_download_statistics_all():
     time.sleep(5)
   
     try:
-        autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
+        autoclick_new_tab(browser.find_element_by_link_text('скачать в виде XLS-файла'))
+        # autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
         # autoclick_sparse_click(browser.find_element_by_xpath('//div/a/span'))
     except NoSuchElementException as err:
         sys.stderr.write("error %d %s\n" % (err.args[0], err.args[1]))
@@ -469,7 +480,8 @@ def autoclick_ya_download_statistics_all():
     time.sleep(5)
 
     try:
-        autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
+        autoclick_new_tab(browser.find_element_by_link_text('скачать в виде XLS-файла'))
+        # autoclick_sparse_click(browser.find_element_by_xpath('//div[@class="b-statistics-form__download-as-xls"]'))
         # autoclick_sparse_click(browser.find_element_by_xpath('//div/a/span'))
     except NoSuchElementException as err:
         sys.stderr.write("error %d %s\n" % (err.args[0], err.args[1]))
